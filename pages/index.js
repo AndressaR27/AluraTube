@@ -27,6 +27,8 @@ function HomePage() {
   `
   
   const StyledHeader = styled.div` 
+      background-color: ${({ theme}) => theme.backgroundLevel1};
+    
     .user-info{
         width: 100%;
         display: flex;
