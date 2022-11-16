@@ -4,9 +4,33 @@ import { CSSReset } from "../src/components/CSSReset.js"
 import Menu from "../src/components/Menu"
 import { StyledTimeline } from "../src/components/TimeLine"
 import React from "react"
+import { videoService } from "../src/services/videoService"
+
+
 
 function HomePage() {
+  const service = videoService()
   const [valorDoFiltro, setValorDoFiltro] = React.useState("")
+  // const playlists = {
+  //   "jogos": []
+  // }
+  const [playlists, setPlaylists] = React.useState({});  //config.playlist
+
+  React.useEffect(() => {
+    service.getAllVideos()
+      .then((dados) => {
+        const novasPlaylists = { ...playlists };
+        dados.data.forEach((video) => {
+          if (!novasPlaylists[video.playlist]) {
+            novasPlaylists[video.playlist] = [];
+          }
+          novasPlaylists[video.playlist].push(video);
+        });
+        setPlaylists(novasPlaylists);
+      });
+  }, []);
+
+
     return (
       <>
         <CSSReset />

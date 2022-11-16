@@ -1,9 +1,10 @@
 import React from "react"
 import { StyledRegisterVideo } from "./styles";
+import { createClient } from "@supabase/supabase-js"
 
 // Custom hook
 function useForm(propsDoForm){
-    const [values, setValues] = React.useState(propsDoForm, initialValues)
+    const [values, setValues] = React.useState(propsDoForm.initialValues)
     
     return {
         values,
@@ -19,11 +20,20 @@ function useForm(propsDoForm){
             setValues({})
         }
     }
+};
+
+const PROJECT_URL = "https://ymrgdebodqiodxjzmjls.supabase.co"
+const PUBLIC_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltcmdkZWJvZHFpb2R4anptamxzIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjgzNzkyNjAsImV4cCI6MTk4Mzk1NTI2MH0.6Qzunq67sdT19UT0JHsusavk9wUfuhZYwSQKehlzcYE"
+const supabase = createClient(PROJECT_URL, PUBLIC_KEY)
+
+//get youtube thumbnail from video url
+function getThumbNail(url){
+    return `https://image.youtube.com/vi/${url.split("v=")[1]}/hqdefault.jpg`
 }
 
 export default function RegisterVideo(){
     const formCadastro = useForm({
-        initialValues: { título: "xpto", url:"http://xpto"}
+        initialValues: { título: "Frost", url:"https://www.youtube.com/watch?v=QsqatJxAUtk"}
     });
 
     const [formVisivel, setFormVisivel] = React.useState(false);
@@ -34,7 +44,23 @@ export default function RegisterVideo(){
             {formVisivel ? (
                 <form 
                     onSubmit={(e)=> 
-                    {e.preventDefault(); setFormVisivel(false); formCadastro.clearForm()}}
+                    {e.preventDefault();
+                    
+                    supabase.from("video").insert({
+                        title: formCadastro.values.titulo,
+                        url: formCadastro.values.url,
+                        thumb: getThumbNail(formCadastro.values.url),
+                        playlist: "front-end"
+                    })
+                    .then((response)=> {
+                        setFormVisivel(false) 
+                        formCadastro.clearForm()
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+                    }}
+
                 >
                 <div>
                     <button type="button" className="close-modal"  onClick={() => setFormVisivel(false)}> X </button>
